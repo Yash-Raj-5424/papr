@@ -46,20 +46,32 @@ Question:
 Answer:
 """)
 
-query = "what is the main idea in this document ?"
-
-response = vector_store.similarity_search(query, k=3)
 
 context = "\n\n".join(doc.page_content for doc in response)
 
 chain = prompt | llm
 
-answer = chain.invoke(
-    {
-        "context": context,
-        "question": query
-    }
-)
+while True:
+    query = input("\nEnter your query (or 'exit'): ")
 
-print("\nAnswer: ")
-print(answer.content)
+    if query.lower == "exit":
+        print("Exiting !!")
+        break
+
+    response = vector_store.similarity_search(query, k=3) 
+
+    contex = "\n\n".join([doc.page_content for doc in response])
+
+    answer = chain.invoke(
+        {
+            "context": context,
+            "question": query
+        }
+    )
+
+    print("\nAnswer: ")
+    print(answer.content)
+    print("\nSources: ")
+    for doc in response:
+        print(f'PDF: {doc.metadata['source']}')
+        print(f'Page: {doc.metadata['page']+1 }')
